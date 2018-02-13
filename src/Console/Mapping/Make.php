@@ -2,7 +2,7 @@
 
 namespace Sleimanx2\Plastic\Console\Mapping;
 
-use Illuminate\Foundation\Composer;
+use Illuminate\Support\Composer;
 use Sleimanx2\Plastic\Mappings\Creator;
 
 class Make extends BaseCommand
