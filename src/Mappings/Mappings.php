@@ -52,7 +52,7 @@ class Mappings
         $result = $this->table()
             ->orderBy('batch', 'asc')
             ->orderBy('mapping', 'asc')
-            ->lists('mapping');
+            ->pluck('mapping');
 
         if (is_array($result)) {
             return $result;
