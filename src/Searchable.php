@@ -31,17 +31,24 @@ trait Searchable
     public $documentVersion = null;
 
     /**
+     * Highlight search result.
+     *
+     * @var null|array
+     */
+    public $highlight = null;
+
+    /**
      * Searchable boot model.
      */
     public static function bootSearchable()
     {
-        static::saved(function ($model) {
+        static::saved(function (self $model) {
             if ($model->shouldSyncDocument()) {
                 $model->document()->save();
             }
         });
 
-        static::deleted(function ($model) {
+        static::deleted(function (self $model) {
             if ($model->shouldSyncDocument()) {
                 $model->document()->delete();
             }

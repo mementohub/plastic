@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use ONGR\ElasticsearchDSL\Query\CommonTermsQuery;
 use ONGR\ElasticsearchDSL\Query\ExistsQuery;
 use ONGR\ElasticsearchDSL\Query\FuzzyQuery;
+use ONGR\ElasticsearchDSL\Highlight\Highlight;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\GeoBoundingBoxQuery;
 use ONGR\ElasticsearchDSL\Query\GeoDistanceQuery;
 use ONGR\ElasticsearchDSL\Query\GeoDistanceRangeQuery;
@@ -90,7 +92,7 @@ class SearchBuilder
      *
      * @var string
      */
-    protected $boolState = 'must';
+    protected $boolState = BoolQuery::MUST;
 
     /**
      * Builder constructor.
@@ -230,7 +232,7 @@ class SearchBuilder
      */
     public function should()
     {
-        $this->boolState = 'should';
+        $this->boolState = BoolQuery::SHOULD;
 
         return $this;
     }
@@ -240,7 +242,7 @@ class SearchBuilder
      */
     public function must()
     {
-        $this->boolState = 'must';
+        $this->boolState = BoolQuery::MUST;
 
         return $this;
     }
@@ -250,7 +252,7 @@ class SearchBuilder
      */
     public function mustNot()
     {
-        $this->boolState = 'must_not';
+        $this->boolState = BoolQuery::MUST_NOT;
 
         return $this;
     }
@@ -260,7 +262,7 @@ class SearchBuilder
      */
     public function filter()
     {
-        $this->filtering = true;
+        $this->boolState = BoolQuery::FILTER;
 
         return $this;
     }
@@ -569,6 +571,33 @@ class SearchBuilder
     }
 
     /**
+     * Add a highlight to result.
+     *
+     * @param array  $fields
+     * @param array  $parameters
+     * @param string $preTag
+     * @param string $postTag
+     *
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-highlighting.html
+     *
+     * @return $this
+     */
+    public function highlight($fields = ['_all' => []], $parameters = [], $preTag = '<mark>', $postTag = '</mark>')
+    {
+        $highlight = new Highlight();
+        $highlight->setTags([$preTag], [$postTag]);
+        foreach ($fields as $field => $fieldParams) {
+            $highlight->addField($field, $fieldParams);
+        }
+        if ($parameters) {
+            $highlight->setParameters($parameters);
+        }
+        $this->query->addHighlight($highlight);
+        return $this;
+    }
+    
+
+    /**
      * Add a range query.
      *
      * @param string $field
@@ -820,11 +849,8 @@ class SearchBuilder
      */
     public function append($query)
     {
-        if ($this->getFilteringState()) {
-            $this->query->addFilter($query, $this->getBoolState());
-        } else {
-            $this->query->addQuery($query, $this->getBoolState());
-        }
+        $this->query->addQuery($query, $this->getBoolState());
+
 
         return $this;
     }

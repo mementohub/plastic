@@ -67,6 +67,10 @@ class EloquentFiller implements FillerInterface
             $instance->documentVersion = $hit['_version'];
         }
 
+        if (isset($hit['highlight']) && property_exists($instance, 'highlight')) {
+            $instance->highlight = $hit['highlight'];
+        }
+
         return $instance;
     }
 
