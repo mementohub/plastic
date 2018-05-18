@@ -1,8 +1,8 @@
 ##List of available mappings
 
-`string`,`date`,`long`,`integer`,`short`,`byte`,`double`,`binary`,`float`,`boolean`,`point`,`shape`,`ip`,`completion`,`tokenCount`,`nested`
+`string`,`date`,`long`,`integer`,`short`,`byte`,`double`,`binary`,`float`,`boolean`,`point`,`shape`,`ip`,`completion`,`tokenCount`,`nested`,`object`
 
-All mappings use the same signature except for the nested mapping lets see some examples.
+All mappings use the same signature except for the nested and object mapping lets see some examples.
 
 ```php
 $map->string('title');
@@ -12,6 +12,9 @@ $map->point('location');
 $map->shape('area');
 
 $map->nested('tag',function(Blueprint $map){
+  $map->string('name');
+})
+$map->object('tag',function(Blueprint $map){
   $map->string('name');
 })
 ```
