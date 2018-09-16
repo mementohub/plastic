@@ -67,10 +67,6 @@ class EloquentFiller implements FillerInterface
             $instance->documentVersion = $hit['_version'];
         }
 
-<<<<<<< HEAD
-=======
-        // Set highlighting if present in result and model
->>>>>>> origin/patch-2
         if (isset($hit['highlight']) && property_exists($instance, 'highlight')) {
             $instance->highlight = $hit['highlight'];
         }

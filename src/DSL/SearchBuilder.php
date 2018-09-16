@@ -3,19 +3,7 @@
 namespace Sleimanx2\Plastic\DSL;
 
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-use ONGR\ElasticsearchDSL\Query\CommonTermsQuery;
-use ONGR\ElasticsearchDSL\Query\ExistsQuery;
-use ONGR\ElasticsearchDSL\Query\FuzzyQuery;
-use ONGR\ElasticsearchDSL\Highlight\Highlight;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\GeoBoundingBoxQuery;
-use ONGR\ElasticsearchDSL\Query\GeoDistanceQuery;
-use ONGR\ElasticsearchDSL\Query\GeoDistanceRangeQuery;
-use ONGR\ElasticsearchDSL\Query\GeohashCellQuery;
-use ONGR\ElasticsearchDSL\Query\GeoPolygonQuery;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
-=======
+
 use Illuminate\Support\Traits\Macroable;
 use ONGR\ElasticsearchDSL\Highlight\Highlight;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
@@ -30,7 +18,7 @@ use ONGR\ElasticsearchDSL\Query\Geo\GeoDistanceRangeQuery;
 use ONGR\ElasticsearchDSL\Query\Geo\GeoPolygonQuery;
 use ONGR\ElasticsearchDSL\Query\Geo\GeoShapeQuery;
 use ONGR\ElasticsearchDSL\Query\Joining\NestedQuery;
->>>>>>> origin/patch-2
+
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\FuzzyQuery;
@@ -273,7 +261,6 @@ class SearchBuilder
     public function filter()
     {
         $this->boolState = BoolQuery::FILTER;
-<<<<<<< HEAD
 
         return $this;
     }
@@ -284,8 +271,6 @@ class SearchBuilder
     public function query()
     {
         $this->filtering = false;
-=======
->>>>>>> origin/patch-2
 
         return $this;
     }
@@ -602,18 +587,7 @@ class SearchBuilder
     {
         $highlight = new Highlight();
         $highlight->setTags([$preTag], [$postTag]);
-<<<<<<< HEAD
-        foreach ($fields as $field => $fieldParams) {
-            $highlight->addField($field, $fieldParams);
-        }
-        if ($parameters) {
-            $highlight->setParameters($parameters);
-        }
-        $this->query->addHighlight($highlight);
-        return $this;
-    }
-    
-=======
+
 
         foreach ($fields as $field => $fieldParams) {
             $highlight->addField($field, $fieldParams);
@@ -627,7 +601,6 @@ class SearchBuilder
 
         return $this;
     }
->>>>>>> origin/patch-2
 
     /**
      * Add a range query.
@@ -896,11 +869,6 @@ class SearchBuilder
     public function append($query)
     {
         $this->query->addQuery($query, $this->getBoolState());
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/patch-2
-
         return $this;
     }
 
