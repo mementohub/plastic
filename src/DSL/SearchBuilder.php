@@ -3,6 +3,7 @@
 namespace Sleimanx2\Plastic\DSL;
 
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
 use ONGR\ElasticsearchDSL\Query\CommonTermsQuery;
 use ONGR\ElasticsearchDSL\Query\ExistsQuery;
 use ONGR\ElasticsearchDSL\Query\FuzzyQuery;
@@ -14,18 +15,32 @@ use ONGR\ElasticsearchDSL\Query\GeoDistanceRangeQuery;
 use ONGR\ElasticsearchDSL\Query\GeohashCellQuery;
 use ONGR\ElasticsearchDSL\Query\GeoPolygonQuery;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
+=======
+use Illuminate\Support\Traits\Macroable;
+use ONGR\ElasticsearchDSL\Highlight\Highlight;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\CommonTermsQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\SimpleQueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\Geo\GeoBoundingBoxQuery;
+use ONGR\ElasticsearchDSL\Query\Geo\GeoDistanceQuery;
+use ONGR\ElasticsearchDSL\Query\Geo\GeoDistanceRangeQuery;
+use ONGR\ElasticsearchDSL\Query\Geo\GeoPolygonQuery;
+use ONGR\ElasticsearchDSL\Query\Geo\GeoShapeQuery;
+use ONGR\ElasticsearchDSL\Query\Joining\NestedQuery;
+>>>>>>> origin/patch-2
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\MatchQuery;
-use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
-use ONGR\ElasticsearchDSL\Query\NestedQuery;
-use ONGR\ElasticsearchDSL\Query\PrefixQuery;
-use ONGR\ElasticsearchDSL\Query\QueryStringQuery;
-use ONGR\ElasticsearchDSL\Query\RangeQuery;
-use ONGR\ElasticsearchDSL\Query\RegexpQuery;
-use ONGR\ElasticsearchDSL\Query\SimpleQueryStringQuery;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
-use ONGR\ElasticsearchDSL\Query\TermsQuery;
-use ONGR\ElasticsearchDSL\Query\WildcardQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\FuzzyQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\PrefixQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RegexpQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\WildcardQuery;
 use ONGR\ElasticsearchDSL\Search as Query;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sleimanx2\Plastic\Connection;
@@ -38,6 +53,8 @@ use Sleimanx2\Plastic\Searchable;
 
 class SearchBuilder
 {
+    use Macroable;
+
     /**
      * An instance of DSL query.
      *
@@ -79,13 +96,6 @@ class SearchBuilder
      * @var Connection
      */
     protected $connection;
-
-    /**
-     * Query filtering state.
-     *
-     * @var bool
-     */
-    protected $filtering = false;
 
     /**
      * Query bool state.
@@ -137,7 +147,7 @@ class SearchBuilder
     /**
      * Set the eloquent model to use when querying elastic search.
      *
-     * @param Model $model
+     * @param Model|Searchable $model
      *
      * @throws InvalidArgumentException
      *
@@ -146,7 +156,7 @@ class SearchBuilder
     public function model(Model $model)
     {
         // Check if the model is searchable before setting the query builder model
-        $traits = class_uses($model);
+        $traits = class_uses_recursive(get_class($model));
 
         if (!isset($traits[Searchable::class])) {
             throw new InvalidArgumentException(get_class($model).' does not use the searchable trait');
@@ -263,6 +273,7 @@ class SearchBuilder
     public function filter()
     {
         $this->boolState = BoolQuery::FILTER;
+<<<<<<< HEAD
 
         return $this;
     }
@@ -273,6 +284,8 @@ class SearchBuilder
     public function query()
     {
         $this->filtering = false;
+=======
+>>>>>>> origin/patch-2
 
         return $this;
     }
@@ -483,24 +496,6 @@ class SearchBuilder
     }
 
     /**
-     * Add a geo hash query.
-     *
-     * @param string $field
-     * @param mixed  $location
-     * @param array  $attributes
-     *
-     * @return $this
-     */
-    public function geoHash($field, $location, array $attributes = [])
-    {
-        $query = new GeohashCellQuery($field, $location, $attributes);
-
-        $this->append($query);
-
-        return $this;
-    }
-
-    /**
      * Add a geo polygon query.
      *
      * @param string $field
@@ -512,6 +507,27 @@ class SearchBuilder
     public function geoPolygon($field, array $points = [], array $attributes = [])
     {
         $query = new GeoPolygonQuery($field, $points, $attributes);
+
+        $this->append($query);
+
+        return $this;
+    }
+
+    /**
+     * Add a geo shape query.
+     *
+     * @param string $field
+     * @param $type
+     * @param array $coordinates
+     * @param array $attributes
+     *
+     * @return $this
+     */
+    public function geoShape($field, $type, array $coordinates = [], array $attributes = [])
+    {
+        $query = new GeoShapeQuery();
+
+        $query->addShape($field, $type, $coordinates, $attributes);
 
         $this->append($query);
 
@@ -586,6 +602,7 @@ class SearchBuilder
     {
         $highlight = new Highlight();
         $highlight->setTags([$preTag], [$postTag]);
+<<<<<<< HEAD
         foreach ($fields as $field => $fieldParams) {
             $highlight->addField($field, $fieldParams);
         }
@@ -596,6 +613,21 @@ class SearchBuilder
         return $this;
     }
     
+=======
+
+        foreach ($fields as $field => $fieldParams) {
+            $highlight->addField($field, $fieldParams);
+        }
+
+        if ($parameters) {
+            $highlight->setParameters($parameters);
+        }
+
+        $this->query->addHighlight($highlight);
+
+        return $this;
+    }
+>>>>>>> origin/patch-2
 
     /**
      * Add a range query.
@@ -708,6 +740,29 @@ class SearchBuilder
     }
 
     /**
+     * Add function score.
+     *
+     * @param \Closure $search
+     * @param \Closure $closure
+     * @param array    $parameters
+     *
+     * @return $this
+     */
+    public function functions(\Closure $search, \Closure $closure, $parameters = [])
+    {
+        $builder = new self($this->connection, new $this->query());
+        $search($builder);
+
+        $builder = new FunctionScoreBuilder($builder, $parameters);
+
+        $closure($builder);
+
+        $this->append($builder->getQuery());
+
+        return $this;
+    }
+
+    /**
      * Set the model filler to use after retrieving the results.
      *
      * @param FillerInterface $filler
@@ -802,25 +857,16 @@ class SearchBuilder
     }
 
     /**
-     * Return the filtering state.
-     *
-     * @return string
-     */
-    public function getFilteringState()
-    {
-        return $this->filtering;
-    }
-
-    /**
      * Paginate result hits.
      *
-     * @param int $limit
+     * @param int      $limit
+     * @param null|int $current
      *
      * @return PlasticPaginator
      */
-    public function paginate($limit = 25)
+    public function paginate($limit = 25, $current = null)
     {
-        $page = $this->getCurrentPage();
+        $page = $this->getCurrentPage($current);
 
         $from = $limit * ($page - 1);
         $size = $limit;
@@ -850,7 +896,10 @@ class SearchBuilder
     public function append($query)
     {
         $this->query->addQuery($query, $this->getBoolState());
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/patch-2
 
         return $this;
     }
@@ -858,10 +907,12 @@ class SearchBuilder
     /**
      * return the current query string value.
      *
+     * @param null|int $current
+     *
      * @return int
      */
-    protected function getCurrentPage()
+    protected function getCurrentPage($current)
     {
-        return \Request::get('page') ? (int) \Request::get('page') : 1;
+        return $current ?: (int) \Request::get('page', 1);
     }
 }

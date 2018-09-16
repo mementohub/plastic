@@ -67,6 +67,10 @@ class EloquentFiller implements FillerInterface
             $instance->documentVersion = $hit['_version'];
         }
 
+<<<<<<< HEAD
+=======
+        // Set highlighting if present in result and model
+>>>>>>> origin/patch-2
         if (isset($hit['highlight']) && property_exists($instance, 'highlight')) {
             $instance->highlight = $hit['highlight'];
         }
@@ -124,9 +128,9 @@ class EloquentFiller implements FillerInterface
                         } else {
 
                           // Check if the relation field is single model or collections
-                          if (!$multiLevelRelation = $this->isMultiLevelArray($value)) {
-                              $value = [$value];
-                          }
+                            if (!$multiLevelRelation = $this->isMultiLevelArray($value)) {
+                                $value = [$value];
+                            }
 
                             $models = $this->hydrateRecursive($relation->getModel(), $value, $relation);
 
