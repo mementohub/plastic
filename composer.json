@@ -14,7 +14,7 @@
   "require": {
     "php": ">=7.0",
     "elasticsearch/elasticsearch": "~6.1.0",
-    "ongr/elasticsearch-dsl": "5.*",
+    "ongr/elasticsearch-dsl": "6.*",
     "illuminate/container": "^5.2",
     "illuminate/contracts": "^5.2",
     "illuminate/console": "^5.2",
